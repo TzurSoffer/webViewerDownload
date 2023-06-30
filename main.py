@@ -12,9 +12,10 @@ from collections import deque
 from webVideoViewer import webViewer
 
 class Downloader:
-    def __init__(self, downloadFPS, downloadResWidth):
-        self.buffer = deque(maxlen=int(60*60*downloadFPS))
+    def __init__(self, downloadFPS, downloadResWidth, downloadPreviusTime=24):
+        self.buffer = deque(maxlen=int(downloadPreviusTime*60*60*downloadFPS))
         self.first = True
+        self.downloadPreviusTime = downloadPreviusTime
         self.fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         self.timeBetweenReads = 1/downloadFPS
         self.downloadResWidth = downloadResWidth
@@ -83,13 +84,15 @@ class VideoStream(webViewer.VideoStream):
                  subpageTemplate="./templates/subpage.html",
                  port=80,
                  downloadFPS=0.5,
-                 downloadResWidth=200
+                 downloadResWidth=200,
+                 downloadPreviusTime=24 #< in hours
                  ):
 
         super().__init__(homePageTemplate=homePageTemplate,
                          subpageTemplate=subpageTemplate,
                          port=port, currentFolder = os.path.dirname(os.path.abspath(__file__)))
 
+        self.downloadPreviusTime = downloadPreviusTime
         self.downloadFPS = downloadFPS
         self.downloadResWidth = downloadResWidth
         self.downloaders = {}
@@ -102,7 +105,7 @@ class VideoStream(webViewer.VideoStream):
         self.app.route('/<name>/download')(self.download)
 
     def renderTemplate(self, name):
-        return render_template(self.subpageTemplate, video_feed=f"/{name}/videoFeed", download_url=f"/{name}/download")
+        return render_template(self.subpageTemplate, video_feed=f"/{name}/videoFeed", download_url=f"/{name}/download", donload_length=str(self.downloadPreviusTime))
 
     def download(self, name):
         try:
@@ -112,7 +115,7 @@ class VideoStream(webViewer.VideoStream):
             return Response(
                 video_data,
                 mimetype='video/mp4',
-                headers={'Content-Disposition': 'attachment; filename=last_24_hours.mp4'}
+                headers={'Content-Disposition': f'attachment; filename=last_{self.downloadPreviusTime}_hours.mp4'}
             )
         except Exception as e:
             print(e)
@@ -121,11 +124,11 @@ class VideoStream(webViewer.VideoStream):
     def imshow(self, name, image):
         super().imshow(name, image)
         if name not in self.downloaders.keys():
-            self.downloaders[name] = Downloader(self.downloadFPS, self.downloadResWidth)
+            self.downloaders[name] = Downloader(self.downloadFPS, self.downloadResWidth, downloadPreviusTime=self.downloadPreviusTime)
         self.downloaders[name].addFrame(image)
 
 if __name__ == '__main__':
-    app = VideoStream()
+    app = VideoStream(downloadPreviusTime=24)
     cap = cv2.VideoCapture(0)
     
     app.run()
