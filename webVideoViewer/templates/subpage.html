@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Web Video Viewer</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      background-color: rgb(247, 247, 247); /* Set background color to msedge light theme background */ 
+      color: #ffffff; /* Set text color to white */
+      font-family: Arial, sans-serif; /* Set font family */
+    }
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: rgb(51, 51, 51); /* Set background color to msedge dark theme background */
+      }
+    }
+
+    h1 {
+      text-align: center; /* Center align the heading */
+      font-size: 32px; /* Increase the font size */
+    }
+
+    img {
+      display: block; /* Ensure the image is a block element */
+      margin: 0 auto; /* Center align the image */
+      max-width: 100%; /* Ensure the image doesn't exceed its container */
+      border-radius: 10px; /* Round the corners of the image */
+    }
+    @media (prefers-color-scheme: dark) {
+      h1 {
+        color: #ffffff;
+      }
+    }
+    @media (prefers-color-scheme: light) {
+      h1 {
+        color: #000000;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1>Video Feed</h1>
+    <img src="{{ video_feed }}" alt="Video Feed">
+  </div>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Homepage</title>
+  <style>
+    :root {
+      --light-bg-color: rgb(247, 247, 247); /* Light theme background color */
+      --dark-bg-color: rgb(51, 51, 51); /* Dark theme background color */
+      --text-color-light: #000000;
+      --text-color-dark: #ffffff;
+      --button-bg-color: transparent; /* Button background color */
+      --button-border-color: rgb(153, 153, 153); /* Button border color */
+      --button-hover-border-color: rgb(200, 200, 200); /* Button border color on hover */
+    }
+
+    body {
+      display: flex;
+      flex-direction: column; /* Stack elements vertically */
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      background-color: var(--light-bg-color);
+      color: var(--text-color);
+      font-family: Arial, sans-serif;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: var(--dark-bg-color);
+      }
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 32px;
+      margin-bottom: 20px; /* Add margin to create space below the heading */
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    button {
+      display: block;
+      width: 200px;
+      margin: 10px auto;
+      padding: 10px;
+      text-align: center;
+      background-color: var(--button-bg-color);
+      color: var(--text-color-dark);
+      font-size: 18px;
+      font-weight: bold;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 2px solid var(--button-border-color);
+      border-radius: 5px;
+      cursor: pointer;
+      transition: border-color 0.3s ease;
+    }
+
+    button:hover {
+      border-color: var(--button-hover-border-color);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      h1 {
+        color: #ffffff;
+      }
+      button {
+        color: var(--text-color-dark);
+      }
+    }
+    @media (prefers-color-scheme: light) {
+      h1 {
+        color: #000000;
+      }
+      button {
+        color: var(--text-color-light);
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Feeds</h1>
+  <div>
+    <ul>
+      {% for name in subpages %}
+        <li>
+          <button onclick="window.location.href='/{{ name }}'">
+            {{ name }}
+          </button>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</body>
+</html>
