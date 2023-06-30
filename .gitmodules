@@ -1,0 +1,3 @@
+[submodule "webVideoViewer"]
+	path = webVideoViewer
+	url = https://github.com/TzurSoffer/webVideoViewer.git
