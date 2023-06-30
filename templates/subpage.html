@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Web Video Viewer</title>
+  <style>
+    :root {
+      --light-bg-color: rgb(247, 247, 247); /* Light theme background color */
+
+      --dark-bg-color: rgb(51, 51, 51); /* Dark theme background color */
+      --button-border-color: rgb(153, 153, 153); /* Dark theme button border color */
+      --button-hover-border-color: rgb(200, 200, 200); /* Dark theme button border color on hover */
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      background-color: var(--light-bg-color);
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: var(--dark-bg-color);
+      }
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 32px;
+    }
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    img {
+      display: block;
+      margin: 0 auto;
+      max-width: 100%;
+      border-radius: 10px;
+    }
+
+    .download-button {
+      display: block;
+      width: 200px;
+      margin: 10px auto;
+      padding: 10px;
+      text-align: center;
+      background-color: transparent; /* Set background color to transparent */
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: bold;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 2px solid var(--button-border-color);
+      border-radius: 5px;
+      cursor: pointer;
+      transition: border-color 0.3s ease; /* Transition only the border color */
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .download-button {
+        color: #ffffff;
+      }
+    }
+
+    @media (prefers-color-scheme: light) {
+      .download-button {
+        color: #000000;
+      }
+    }
+    .download-button:hover {
+      border-color: var(--button-hover-border-color);
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1>Video Feed</h1>
+    <img src="{{ video_feed }}" alt="Video Feed">
+    <button class="download-button" onclick="window.location.href='{{ download_url }}'">Download Previous Hour</button>
+  </div>
+</body>
+</html>
