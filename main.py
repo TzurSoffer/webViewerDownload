@@ -9,6 +9,15 @@ from flask import render_template, Response
 
 from webVideoViewer import webViewer
 
+class WebPage:
+    def __init__(self, img=None, downloader=None):
+        self.img = img
+        self.downloader = downloader
+
+class SubpageManager(dict):
+    def __getitem__(self, __key):
+        return(self.get(__key, None))
+
 class Downloader():
     """Class responsible for downloading and creating videos."""
     def __init__(self, downloadEvery, downloadResWidth, downloadPreviousTime=24):
@@ -109,7 +118,6 @@ class VideoStream(webViewer.VideoStream):
         self.downloadPreviousTime = downloadPreviousTime                           #< The maximum amount of time to save frames for downloading (in hours)
         self.downloadEvery = downloadEvery                                         #< The time interval between frame downloads in seconds
         self.downloadResWidth = downloadResWidth                                   #< The width of the downloaded frames
-        self.downloaders = {}                                                      #< Dictionary to store Downloader objects for each subpage
 
     def _getTimestamp(self) -> str:
         """
@@ -154,7 +162,10 @@ class VideoStream(webViewer.VideoStream):
             Response: The response object containing the video file data.
         """
         try:
-            downloader = self.downloaders[name]
+            subpage = self.manager[name]
+            if subpage == None:
+                return('Error')
+            downloader = subpage.downloader
             video_data = downloader.download()                                     #< Call the download method of the corresponding Downloader object
             fileName = f"last_{self.downloadPreviousTime}_hours_{self._getTimestamp()}.mp4"
 
@@ -166,8 +177,19 @@ class VideoStream(webViewer.VideoStream):
         except Exception as e:
             print(e)
             return('Error')
+    
+    def _getImg(self, name) :
+        """ get the img from "name" """
+        return(self.manager[name].img)
 
-    def imshow(self, name, image):
+    def _setImg(self, name, img) -> None:
+        """ set the "name" to the "img" """
+        self.manager[name].img = img
+    
+    def _addFrameToDownloader(self, name, img):
+        self.manager[name].downloader.addFrame(img)
+    
+    def imshow(self, name, img):
         """
         Display an image on the subpage with the given name.
 
@@ -175,13 +197,17 @@ class VideoStream(webViewer.VideoStream):
             name (str): The name of the subpage.
             image (numpy.ndarray): The image to display.
         """
-        super().imshow(name, image)                                                #< Call the imshow method of the parent class
-        if name not in self.downloaders.keys():
-            self.downloaders[name] = Downloader(self.downloadEvery,
-                                                self.downloadResWidth,
-                                                downloadPreviousTime=self.downloadPreviousTime
-                                                )                                  #< Create a Downloader object for the subpage if it doesn't exist
-        self.downloaders[name].addFrame(image)                                     #< Add the frame to the corresponding Downloader object
+        
+        if name not in self.manager:
+            self.manager[name] = WebPage(                                        #< Create a WebPage object for the subpage if it doesn't exist
+                img=img,
+                downloader=Downloader(self.downloadEvery,                        #< Create a Downloader object
+                           self.downloadResWidth,
+                           downloadPreviousTime=self.downloadPreviousTime
+                           )
+                )
+        super().imshow(name, img)                                                #< Call the imshow method of the parent class
+        self._addFrameToDownloader(name, img)                                          #< add the frame to the downloader
 
 if __name__ == '__main__':
     cap = cv2.VideoCapture(0)

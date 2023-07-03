@@ -37,11 +37,11 @@ class VideoStream():
 
     def index(self) -> str:
         """Returns the rendered HTML content for the home page"""
-        return render_template(self.homePageTemplate, subpages=list(self.manager.keys()))  #< Render the home page template
+        return(render_template(self.homePageTemplate, subpages=list(self.manager.keys())))  #< Render the home page template
 
-    def renderTemplate(self, subpage) -> str:
+    def renderTemplate(self, name) -> str:
         """Returns the rendered subpage(str)"""
-        return render_template(self.subpageTemplate, video_feed=f"/{subpage}/videoFeed")  #< Render the subpage template
+        return(render_template(self.subpageTemplate, video_feed=f"/{name}/videoFeed"))  #< Render the subpage template
 
     def subpage(self, name):
         """
@@ -55,7 +55,7 @@ class VideoStream():
         """
         def generate_imgs():
             while True:
-                img = self.manager[name]
+                img = self._getImg(name)
                 if img:
                     yield b'--img\r\n'
                     yield b'Content-Type: image/jpeg\r\n\r\n'
@@ -66,18 +66,18 @@ class VideoStream():
                     yield b'<h1>No subpage found for {name}</h1>\r\n\r\n'  #< Return a message if no img is found for the subpage
 
         return Response(generate_imgs(), mimetype='multipart/x-mixed-replace; boundary=img')  #< Return the response object
+    
+    def _getImg(self, name):
+        return(self.manager[name])
+    
+    def _setImg(self, name, img) -> None:
+        self.manager[name] = img
 
     def imshow(self, name, img) -> None:
-        """
-        Displays an image on a subpage.
-
-        Args:
-            name (str): Name of the subpage.
-            img: Image to be displayed.
-        """
+        """ Displays an image "img" on the subpage "name" """
         _, buffer = cv2.imencode('.jpg', img)          #< Encode the img as a JPEG image
         img = base64.b64encode(buffer).decode('utf-8') #< Encode the image data as base64 string
-        self.manager[name] = img                       #< Store the img in the SubpageManager
+        self._setImg(name, img)                        #< Store the img in the SubpageManager
 
     def run(self) -> None:
         """Runs the Flask application in a separate thread"""
